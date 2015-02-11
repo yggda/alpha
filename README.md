@@ -9,7 +9,7 @@ A simple image website using the Sequelize ORM for MySQL and Redis for sessions.
 
 This site has a simple Bootstrap themed UI to allow users to log in, upload photos, view their own uploads, and view everyone's uploaded photos and vote on them. The image and user metadata is stored in MySQL while the image ranking is accomplished by a Redis sorted set.
 
-The server uses the ImageMagick library to resize uploaded photos, clean them, and convert them to the .jpeg format.
+The server uses the GraphicsMagick library to resize uploaded photos, clean them, and convert them to the .jpeg format.
 
 The ranking algorithm works in the following way: Images are first sorted based on how many half days they were posted after some point in time. Upvotes then "give the image another half day" so that an image that is a half day older with 1 vote would be the same rank as a brand new image. This is implemented effeciently with the sorted set in Redis. Upvotes and Downvotes simply increment or decrement the "score" of the image's id. To display the number of votes on the site (without the time component) the same formula is applied in reverse.
 
@@ -22,7 +22,7 @@ you need to compile all the Coffeescript to run the script that builds the MySQL
 
 First run `./scripts/build.sh` and then run `node ./bin/oneoff/init_db.js` until it says the initialization has finished.
 
-Before you can upload or resize images, you will need to have ImageMagick and GraphicsMagick installed and you will need to create the following directories: `./image/{thumbnail, optimized, original}`. I recommend setting up nginx to serve the image files. A simple example nginx config is below for serving the images and routing all other requests through the node server:
+Before you can upload or resize images, you will need to have GraphicsMagick installed and you will need to create the following directories: `./image/{thumbnail, optimized, original}`. I recommend setting up nginx to serve the image files. A simple example nginx config is below for serving the images and routing all other requests through the node server:
 
 ```
 http {

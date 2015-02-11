@@ -1,5 +1,4 @@
 fs = require 'fs-extra'
-im = require 'imagemagick'
 gm = require 'gm'
 uuid = require 'node-uuid'
 
@@ -82,31 +81,32 @@ post_upload = (req, res) ->
           }
 
         if features == 'GIF'
-          im.convert [original_path, '-coalesce', coalesced_path], (err) ->
+          gm(original_path).coalesce().write coalesced_path,(err) ->
             if err
               return error_exit err
 
-            im.convert [coalesced_path, '-thumbnail', '200x200^', '-gravity', 'center', '-extent',
-                        '200x200', '-auto-orient', thumbnail_path_gif], (err) ->
+            gm(coalesced_path).resize( 640, 640).autoOrient()
+            .rotate('white',0).write optimized_path_gif, (err) ->
               if err
                 return error_exit err
-              im.convert [coalesced_path, '-resize', '640\>', '-auto-orient', '-background',
-                          'white', optimized_path_gif], (err) ->
-                if err
-                  return error_exit err
-                build_db_object('.gif')
+              build_db_object('.gif')
+
+            gm(coalesced_path).gravity('Center').extent(400,400).autoOrient()
+            .thumb 200,200,thumbnail_path_gif,50, (err) ->
+              if err
+                return error_exit err
+
         else
           # Convert the image to a .jpg with the proper resizing
-          im.convert [original_path, '-resize', '640\>', '-auto-orient', '-background',
-                      'white', '-flatten', optimized_path], (err) ->
+          gm(original_path).resize( 640, 640).autoOrient()
+          .rotate('white',0).flatten().write optimized_path, (err) ->
             if err
               return error_exit err
-            # Now make a thumbnail of it too
-            im.convert [original_path, '-thumbnail', '200x200^', '-gravity', 'center', '-extent',
-                        '200x200', '-auto-orient', thumbnail_path], (err) ->
-              if err
-                return error_exit err
-              build_db_object('.jpg')
+          gm(original_path).gravity('Center').extent(200,200)
+          .autoOrient().thumb 200,200,thumbnail_path,50, (err) ->
+            if err
+              return error_exit err
+            build_db_object('.jpg')
 
 _vote_helper = (req, res, score_increment) ->
   fail = (err) ->
