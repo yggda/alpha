@@ -6,7 +6,9 @@ module.exports = (sequelize, DataTypes) ->
       type: DataTypes.STRING,
       unique: true
     }
+    email: {type: DataTypes.STRING, allowNull: false, validate: {isEmail: true}},
     password: DataTypes.STRING,
+
     is_mod: {
       type: DataTypes.BOOLEAN,
       defaultValue: false

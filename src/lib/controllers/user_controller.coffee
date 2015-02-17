@@ -19,7 +19,9 @@ post_user_create = (req, res) ->
 
   username = req.body.username
   password = req.body.password
-  new_user = models.User.build({username})
+  email = req.body.email
+
+  new_user = models.User.build({username,email})
   new_user.hash_and_set_password password, (err) ->
     if err?
       res.render 'error', err
